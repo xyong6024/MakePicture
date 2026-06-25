@@ -46,6 +46,52 @@ node src/server.mjs
 http://localhost:3000
 ```
 
+## 服务器部署
+
+推荐服务器使用 `pm2` 托管，这样后续更新不需要每次手工启动。
+
+### 首次部署
+
+```bash
+git clone https://github.com/xyong6024/MakePicture.git
+cd MakePicture
+cp .env.example .env
+# 编辑 .env，填入你的真实配置
+bash scripts/deploy-first-run.sh
+```
+
+### 后续更新
+
+以后每次你本地改完并推到 GitHub，服务器只需要执行：
+
+```bash
+cd /你的项目目录/MakePicture
+bash scripts/deploy-update.sh
+```
+
+这个脚本会自动完成：
+
+- 拉取远程最新代码
+- 覆盖当前代码到 `origin/main`
+- 保留本地 `.env`
+- 自动重启 `pm2` 服务
+
+### Windows Server 更新
+
+如果你的服务器是 Windows：
+
+```powershell
+cd C:\你的项目目录\MakePicture
+powershell -ExecutionPolicy Bypass -File .\scripts\deploy-update.ps1
+```
+
+### 注意
+
+- `deploy-update.sh` 和 `deploy-update.ps1` 会执行 `git reset --hard origin/main`
+- 这意味着服务器代码会被远程仓库版本覆盖
+- 不要在服务器项目目录里直接手改业务代码
+- `.env` 不会被 git 跟踪，所以会保留下来
+
 ## 当前两种 Provider
 
 ### 1. `mock` 模式
