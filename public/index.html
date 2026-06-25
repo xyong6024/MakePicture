@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 批量智能改尺寸</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">AI Smart Resize Studio</p>
+          <h1>批量把任意尺寸图片，智能变成你要的尺寸。</h1>
+          <p class="hero-text">
+            不是简单拉伸，不是生硬裁切。这个项目的目标是让 AI
+            根据每张图的构图、主体和场景，生成更适合目标比例的新图。
+          </p>
+        </div>
+        <div class="hero-panel">
+          <div class="badge-row">
+            <span class="badge badge-accent">批量处理</span>
+            <span class="badge" id="providerBadge">Provider: loading...</span>
+          </div>
+          <div class="metric-grid">
+            <article>
+              <strong>1</strong>
+              <span>上传一批图</span>
+            </article>
+            <article>
+              <strong>2</strong>
+              <span>设置目标尺寸</span>
+            </article>
+            <article>
+              <strong>3</strong>
+              <span>AI 逐张优化输出</span>
+            </article>
+          </div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="card control-card">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Step 1</p>
+              <h2>尺寸与策略</h2>
+            </div>
+            <div class="header-actions">
+              <button class="ghost-button" id="downloadAllButton" type="button">批量下载</button>
+              <button class="ghost-button" id="clearButton" type="button">清空列表</button>
+            </div>
+          </div>
+
+          <div class="preset-grid" id="presetGrid"></div>
+
+          <div class="custom-size">
+            <label>
+              <span>宽度</span>
+              <input id="widthInput" type="number" min="1" value="900" />
+            </label>
+            <label>
+              <span>高度</span>
+              <input id="heightInput" type="number" min="1" value="1600" />
+            </label>
+            <label>
+              <span>输出策略</span>
+              <select id="modeSelect">
+                <option value="smart-expand">智能扩展</option>
+                <option value="center-crop">中心裁切</option>
+                <option value="passthrough">尽量保留原图</option>
+              </select>
+            </label>
+            <label>
+              <span>输出语种</span>
+              <select id="languageSelect">
+                <option value="source">保持原语言</option>
+                <option value="zh-CN">中文</option>
+                <option value="en">English</option>
+                <option value="de">Deutsch</option>
+                <option value="fr">Francais</option>
+                <option value="ru">Russkiy</option>
+              </select>
+            </label>
+          </div>
+          <p class="field-help" id="modeHelp"></p>
+
+          <label class="prompt-field">
+            <span>AI 附加提示词</span>
+            <textarea
+              id="promptInput"
+              rows="4"
+              placeholder="例如：保留主体完整，避免人物脸部裁切，生成适合电商详情页的清爽构图。"
+            ></textarea>
+          </label>
+
+          <div class="uploader">
+            <input id="fileInput" type="file" accept="image/*" multiple />
+            <p>支持多选图片。前端会读取原始尺寸，并逐张提交到后端处理。</p>
+          </div>
+
+          <div class="action-row">
+            <button class="primary-button" id="startButton" type="button">开始批量处理</button>
+            <p class="action-hint" id="statusText">还没有加入图片。</p>
+          </div>
+        </section>
+
+        <section class="card queue-card">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Step 2</p>
+              <h2>批量任务队列</h2>
+            </div>
+            <span class="mini-stat" id="queueCount">0 张</span>
+          </div>
+
+          <div class="queue-list" id="queueList">
+            <div class="empty-state">
+              <h3>把图片拖进来，或者点上面的选择框。</h3>
+              <p>每张图都会显示原始尺寸、处理状态和最终结果。</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <template id="queueItemTemplate">
+      <article class="queue-item">
+        <img class="thumb" alt="" />
+        <div class="queue-content">
+          <div class="queue-topline">
+            <h3 class="file-name"></h3>
+            <span class="status-chip"></span>
+          </div>
+          <p class="meta"></p>
+          <div class="progress-track">
+            <div class="progress-fill"></div>
+          </div>
+          <div class="result-block"></div>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

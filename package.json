@@ -1,0 +1,11 @@
+{
+  "name": "ai-smart-resizer",
+  "version": "0.1.0",
+  "description": "Batch AI-powered image resizing project scaffold.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "dev": "node --watch src/server.mjs"
+  }
+}
