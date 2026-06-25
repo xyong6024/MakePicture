@@ -38,6 +38,11 @@ function buildHeaders() {
   return headers;
 }
 
+function appendImageFile(form, fieldName, buffer, fileName, mimeType) {
+  const blob = new Blob([buffer], { type: mimeType });
+  form.append(fieldName, blob, fileName);
+}
+
 export async function transformWithHttpProvider({
   inputBuffer,
   inputMimeType,
@@ -55,9 +60,8 @@ export async function transformWithHttpProvider({
   }
 
   const form = new FormData();
-  const file = new File([inputBuffer], inputFileName, { type: inputMimeType });
 
-  form.set(config.apiImageField, file);
+  appendImageFile(form, config.apiImageField, inputBuffer, inputFileName, inputMimeType);
   form.set("targetWidth", String(targetWidth));
   form.set("targetHeight", String(targetHeight));
   form.set("originalWidth", String(originalWidth));

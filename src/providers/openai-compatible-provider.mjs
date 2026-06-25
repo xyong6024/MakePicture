@@ -22,6 +22,11 @@ function buildAuthHeaders() {
   return headers;
 }
 
+function appendImageFile(form, fieldName, buffer, fileName, mimeType) {
+  const blob = new Blob([buffer], { type: mimeType });
+  form.append(fieldName, blob, fileName);
+}
+
 function buildResizePrompt({
   prompt,
   targetWidth,
@@ -171,10 +176,9 @@ async function callImagesEditsApi(input) {
   const endpoint = joinUrl(config.openAiCompatBaseUrl, config.openAiCompatImagesEditPath);
   const form = new FormData();
   const prompt = buildResizePrompt(input);
-  const file = new File([input.inputBuffer], input.inputFileName, { type: input.inputMimeType });
 
   form.set("model", config.openAiCompatModel);
-  form.set("image", file);
+  appendImageFile(form, "image", input.inputBuffer, input.inputFileName, input.inputMimeType);
   form.set("prompt", prompt);
   form.set("size", `${input.targetWidth}x${input.targetHeight}`);
   form.set("quality", config.openAiCompatQuality);
@@ -203,10 +207,9 @@ async function callImagesEditsApi(input) {
 async function uploadFileToGateway(input) {
   const endpoint = joinUrl(config.openAiCompatBaseUrl, config.openAiCompatFilesPath);
   const form = new FormData();
-  const file = new File([input.inputBuffer], input.inputFileName, { type: input.inputMimeType });
 
   form.set("purpose", "vision");
-  form.set("file", file);
+  appendImageFile(form, "file", input.inputBuffer, input.inputFileName, input.inputMimeType);
 
   const response = await withTimeout(
     (signal) =>
