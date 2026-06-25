@@ -47,6 +47,15 @@ const crcTable = (() => {
   return table;
 })();
 
+function createItemId() {
+  if (globalThis.crypto?.randomUUID) {
+    return globalThis.crypto.randomUUID();
+  }
+
+  const randomPart = Math.random().toString(36).slice(2);
+  return `${Date.now().toString(36)}-${randomPart}`;
+}
+
 function formatStatus(status) {
   const map = {
     pending: "待处理",
@@ -359,23 +368,34 @@ function fileToDataUrl(file) {
 
 async function addFiles(files) {
   const nextItems = [];
+  const errors = [];
 
   for (const file of files) {
-    const meta = await readImageMeta(file);
-    nextItems.push({
-      id: crypto.randomUUID(),
-      file,
-      previewUrl: meta.previewUrl,
-      originalWidth: meta.originalWidth,
-      originalHeight: meta.originalHeight,
-      status: "pending",
-      result: null,
-      error: ""
-    });
+    try {
+      const meta = await readImageMeta(file);
+      nextItems.push({
+        id: createItemId(),
+        file,
+        previewUrl: meta.previewUrl,
+        originalWidth: meta.originalWidth,
+        originalHeight: meta.originalHeight,
+        status: "pending",
+        result: null,
+        error: ""
+      });
+    } catch (error) {
+      errors.push(error.message || file.name);
+    }
   }
 
-  state.items = [...state.items, ...nextItems];
-  renderQueue();
+  if (nextItems.length) {
+    state.items = [...state.items, ...nextItems];
+    renderQueue();
+  }
+
+  if (errors.length) {
+    statusText.textContent = `Some files could not be loaded: ${errors.join(", ")}`;
+  }
 }
 
 async function fetchConfig() {
@@ -481,8 +501,13 @@ fileInput.addEventListener("change", async (event) => {
     return;
   }
 
-  await addFiles(files);
-  fileInput.value = "";
+  try {
+    await addFiles(files);
+  } catch (error) {
+    statusText.textContent = error.message || "Failed to add selected files.";
+  } finally {
+    fileInput.value = "";
+  }
 });
 
 clearButton.addEventListener("click", clearItems);
