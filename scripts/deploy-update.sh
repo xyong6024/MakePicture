@@ -20,10 +20,10 @@ mkdir -p outputs/generated work/uploads
 echo "[5/6] Refreshing runtime..."
 if command -v pm2 >/dev/null 2>&1; then
   if pm2 describe makepicture >/dev/null 2>&1; then
-    pm2 restart makepicture --update-env
-  else
-    pm2 start ecosystem.config.cjs --only makepicture --update-env
+    pm2 delete makepicture >/dev/null 2>&1 || true
   fi
+
+  pm2 start ecosystem.config.cjs --only makepicture --update-env
 
   pm2 save >/dev/null 2>&1 || true
 else

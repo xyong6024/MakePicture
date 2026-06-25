@@ -24,6 +24,9 @@ if ! command -v pm2 >/dev/null 2>&1; then
 fi
 
 echo "[4/5] Starting service..."
+if pm2 describe makepicture >/dev/null 2>&1; then
+  pm2 delete makepicture >/dev/null 2>&1 || true
+fi
 pm2 start ecosystem.config.cjs --only makepicture --update-env
 pm2 save
 

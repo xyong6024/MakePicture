@@ -20,12 +20,21 @@ New-Item -ItemType Directory -Force -Path "$AppDir\work\uploads" | Out-Null
 
 Write-Host "[5/6] Refreshing runtime..."
 if (Get-Command pm2 -ErrorAction SilentlyContinue) {
+  $exists = $true
   try {
     pm2 describe makepicture *> $null
-    pm2 restart makepicture --update-env
   } catch {
-    pm2 start ecosystem.config.cjs --only makepicture --update-env
+    $exists = $false
   }
+
+  if ($exists) {
+    try {
+      pm2 delete makepicture *> $null
+    } catch {
+    }
+  }
+
+  pm2 start ecosystem.config.cjs --only makepicture --update-env
 
   try {
     pm2 save *> $null
